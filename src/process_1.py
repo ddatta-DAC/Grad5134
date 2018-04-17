@@ -33,7 +33,7 @@ def create_user_item_matrix():
         i_idx = lid -1
         matrix[u_idx][i_idx] += 1
 
-    print 'Compressed Represeentation of User-Item Matrix ', csr_matrix(matrix)
+    # print 'Compressed Represeentation of User-Item Matrix ', csr_matrix(matrix)
     return matrix
 
 
