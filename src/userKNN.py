@@ -41,19 +41,36 @@ def similarity(vec_a,vec_b) :
     res = pearson_sim(vec_a,vec_b)
     return res
 
+def aux_get_sim ( matrix , idx1, idx2):
+    score =  similarity( matrix[idx1,:], matrix[idx2,:])
+    print ' In aux_get_sim ', idx1, idx2, score
+    return (idx1, idx2, score)
+
 class top_k:
 
     def __init__(self,closest_user_k, closest_items_k):
+
         self.sim_matrix_file = 'user_sim_matrix.dat'
+        self.rating_matrix_file = 'rating_1_matrix.dat'
+
         self.closest_user_k = closest_user_k
+        self.closest_items_k = closest_items_k
+
         self.ui_matrix = process_1.create_user_item_matrix()
         self.users = process_1.get_user_ids()
         self.items = process_1.get_loc_ids()
         self.num_users = len(self.users)
+        self.num_items = len(self.items)
+
         self.sim_init_val = -1000.00
         self.similarity_scores = np.full([self.num_users,self.num_users],self.sim_init_val , np.float )
+
+        self.rating_matrix = None
+        self.similarity_scores = None
         self.setup_similarity_matrix()
-        self.setup_top_k()
+        self.setup_rating_matrix()
+
+        return
 
     # set up the similarity score matrix
     def setup_similarity_matrix(self):
@@ -69,24 +86,50 @@ class top_k:
             other_users = list(self.users)
             other_users.remove(user)
 
-            for other_user in other_users :
-                other_user_idx = other_user - 1
-                if self.similarity_scores[user_idx, other_user_idx] != self.sim_init_val :
-                    continue
-                score = similarity(self.ui_matrix[user_idx], self.ui_matrix[other_user_idx])
+            results = Parallel(5)(delayed(aux_get_sim)(self.ui_matrix, user_idx, other_user-1) for other_user in other_users)
+
+            for res in results :
+                score = res[2]
+                other_user_idx = res[1]
                 self.similarity_scores[user_idx, other_user_idx] = score
-                self.similarity_scores[other_user_idx, user_idx ] = score
-                # print 'user_idx, other_user_idx  = score' , user_idx +1 ,' : ',  other_user_idx +1 , score
+                self.similarity_scores[other_user_idx, user_idx] = score
+
+            # for other_user in other_users :
+            #
+            #     other_user_idx = other_user - 1
+            #     if self.similarity_scores[user_idx, other_user_idx] != self.sim_init_val :
+            #         continue
+            #     score = similarity(self.ui_matrix[user_idx], self.ui_matrix[other_user_idx])
+            #     self.similarity_scores[user_idx, other_user_idx] = score
+            #     self.similarity_scores[other_user_idx, user_idx ] = score
+            #     print 'user_idx, other_user_idx  = score' , user_idx +1 ,' : ',  other_user_idx +1 , score
 
         # Write the similarity matrix to file
         file = open(self.sim_matrix_file,'w')
-        cPickle.dump(self.similarity_scores)
+        cPickle.dump(self.similarity_scores,file)
         file.close()
         return
 
 
-    def setup_top_k( self ):
+    def setup_rating_matrix( self ):
+
+        if os.path.exists(self.rating_matrix_file):
+            file = open(self.rating_matrix_file, 'r')
+            self.rating_matrix = cPickle.load(file)
+            file.close()
+
         ui_matrix = self.ui_matrix
+        rating_matrix = np.zeros([self.num_users,self.num_items])
+        # set up a dictionary for each item:users who have rating for it
+        # This stores item_id : user_id
+        item_user_dict = { }
+        for item in self.items:
+
+            item_idx = item - 1
+            # set of users where j_idx is non zero
+            j_users_idx = list(np.nonzero(ui_matrix[:, item_idx]))
+            item_user_dict[item] =  [ y+1 for y in j_users_idx]
+
 
         # set up the top k neighbors for each user
         for user in self.users:
@@ -95,37 +138,66 @@ class top_k:
             mean_u = np.mean(row_vec)
             sim_vec = self.similarity_scores[user_idx]
 
-            # Find the k closest
-            k_closest_dict = OrderedDict()
-            for _ui, val in zip(range(0,self.num_users), sim_vec):
-                # do not include self - similarity score
-                if _ui == user_idx :
-                    continue
-                k_closest_dict [_ui+1] = val
+            # Find the z closest users to user u
+            # where item j has rating
+            # for each item
+            for j in self.items:
 
-            sorted_k_closest_dict = sorted(k_closest_dict.items(),
-                                               key= operator.itemgetter(1))
+                j_idx = j-1
+                # set of users where j_idx is non zero
+                user_id_list = item_user_dict[j]
+                j_users_idx = [y-1 for y in user_id_list]
 
-            k_closest_dict = itertools.islice(sorted_k_closest_dict.items(), 0, self.closest_user_k)
-            print k_closest_dict
+                #  This stores user_index : score
+                k_closest_dict = OrderedDict()
 
+                for j_user_idx in j_users_idx:
+                    # do not include self - similarity score
+                    if j_user_idx == user_idx :
+                        continue
+                    k_closest_dict [j_user_idx] = sim_vec[j_user_idx]
+
+                k_closest_dict = sorted(
+                    k_closest_dict.items(),
+                    key = operator.itemgetter(1)
+                )
+
+                k_closest_dict = itertools.islice(k_closest_dict.items(), 0, self.closest_user_k)
+                k_closest_user_idx_j = k_closest_dict.keys()
+
+                # Calculate the rating of item j for user u
+                num = 0.0
+                den = 0.0
+                for user_v_idx, sim_score in k_closest_dict.iteritems():
+                    z = (self.ui_matrix[user_v_idx][j_idx] - np.mean(self.ui_matrix[user_v_idx]))
+                    num += sim_score * z
+                    den += abs(z)
+                r_uj = mean_u + (num/den)
+
+                rating_matrix[user_idx][j_idx] = r_uj
+
+        self.rating_matrix = rating_matrix
+        # Save the rating matrix
+        file = open(self.rating_matrix_file, 'w')
+        cPickle.dump(self.rating_matrix, file)
+        #         file.close()
         return
 
 
 
-def get_top_k_obj(closest_user_k , closest_items_k) :
-    obj_file = 'userKNN_obj_'+str(closest_user_k) + '_' + str(closest_items_k) + '.dat'
+# def get_top_k_obj(closest_user_k , closest_items_k) :
+#     obj_file = 'userKNN_obj_'+str(closest_user_k) + '_' + str(closest_items_k) + '.dat'
+#
+#     if os.path.exists(obj_file):
+#         file = open(obj_file, 'r')
+#         obj = cPickle.load(file)
+#         file.close()
+#     else:
+#         file = open(obj_file , 'w')
+#         obj = top_k(closest_user_k, closest_items_k)
+#         cPickle.dump(obj,file)
+#         file.close()
+#     return obj
 
-    if os.path.exists(obj_file):
-        file = open(obj_file, 'r')
-        obj = cPickle.load(file)
-        file.close()
-    else:
-        file = open(obj_file , 'w')
-        obj = top_k(closest_user_k, closest_items_k)
-        cPickle.dump(obj,file)
-        file.close()
-    return obj
 
-
-get_top_k_obj(10 , 10)
+top_k(10 , 10)
