@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b99834f6-bf7e-4efc-ac51-6a4c3a300d1e" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/src/1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/itemKNN.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/itemKNN.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/userKNN.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/userKNN.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -18,8 +18,8 @@
       <file leaf-file-name="process_1.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/process_1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="386">
-              <caret line="33" column="32" lean-forward="true" selection-start-line="33" selection-start-column="8" selection-end-line="33" selection-end-column="32" />
+            <state relative-caret-position="270">
+              <caret line="15" column="27" selection-start-line="15" selection-start-column="4" selection-end-line="15" selection-end-column="27" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -27,11 +27,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="userKNN.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/userKNN.py">
+      <file leaf-file-name="itemKNN.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/itemKNN.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
-              <caret line="99" column="6" lean-forward="true" selection-start-line="99" selection-start-column="6" selection-end-line="105" selection-end-column="55" />
+            <state relative-caret-position="-1132">
+              <caret line="93" column="31" lean-forward="true" selection-start-line="93" selection-start-column="31" selection-end-line="93" selection-end-column="31" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
@@ -39,14 +39,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="1.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/1.py">
+      <file leaf-file-name="userKNN.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/userKNN.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="558">
-              <caret line="31" column="43" lean-forward="true" selection-start-line="23" selection-end-line="31" selection-end-column="43" />
+            <state relative-caret-position="18">
+              <caret line="16" selection-start-line="16" selection-end-line="43" />
               <folding>
-                <element signature="e#0#28#0" expanded="true" />
+                <element signature="e#0#16#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="process.py" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/lib/python2.7/multiprocessing/process.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1980">
+              <caret line="113" selection-start-line="113" selection-end-line="113" />
             </state>
           </provider>
         </entry>
@@ -63,7 +72,7 @@
       <file leaf-file-name="venue.csv" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dataset/data/venue.csv">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="468">
+            <state relative-caret-position="1116">
               <caret line="62" column="27" selection-start-line="62" selection-start-column="3" selection-end-line="62" selection-end-column="27" />
             </state>
           </provider>
@@ -103,18 +112,18 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/config.py" />
-        <option value="$PROJECT_DIR$/src/itemKNN.py" />
         <option value="$PROJECT_DIR$/src/process_1.py" />
         <option value="$PROJECT_DIR$/src/1.py" />
         <option value="$PROJECT_DIR$/src/userKNN.py" />
+        <option value="$PROJECT_DIR$/src/itemKNN.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1200" />
-    <option name="y" value="23" />
-    <option name="width" value="1680" />
-    <option name="height" value="999" />
+    <option name="x" value="1820" />
+    <option name="y" value="110" />
+    <option name="width" value="1670" />
+    <option name="height" value="1015" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -143,12 +152,6 @@
             <path>
               <item name="Grad5134" type="b2602c69:ProjectViewProjectNode" />
               <item name="Grad5134" type="462c0819:PsiDirectoryNode" />
-              <item name="dataset" type="462c0819:PsiDirectoryNode" />
-              <item name="processed" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Grad5134" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Grad5134" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -158,7 +161,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../cs6604/Time-Series-Analysis" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -172,7 +175,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.userKNN">
+  <component name="RunManager" selected="Python.itemKNN">
     <configuration name="1" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Grad5134" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -186,6 +189,24 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/1.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="itemKNN" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Grad5134" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/itemKNN.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -231,9 +252,11 @@
       <item itemvalue="Python.process_1" />
       <item itemvalue="Python.userKNN" />
       <item itemvalue="Python.1" />
+      <item itemvalue="Python.itemKNN" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.itemKNN" />
         <item itemvalue="Python.userKNN" />
         <item itemvalue="Python.1" />
         <item itemvalue="Python.process_1" />
@@ -264,12 +287,10 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1680" y="27" width="1920" height="1140" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17774262" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3296146" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Python Console" order="9" weight="0.3296146" />
       <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3296146" />
@@ -283,12 +304,58 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/process_1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="33" column="32" lean-forward="true" selection-start-line="33" selection-start-column="8" selection-end-line="33" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/python2.7/multiprocessing/process.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1980">
+          <caret line="113" selection-start-line="113" selection-end-line="113" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dataset/data/user.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="1" column="10" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dataset/data/venue.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1116">
+          <caret line="62" column="27" selection-start-line="62" selection-start-column="3" selection-end-line="62" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dataset/data/ratings.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="1" column="30" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="1" column="13" selection-start-line="1" selection-start-column="13" selection-end-line="1" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/process_1.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
@@ -327,9 +394,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dataset/processed/ratings.csv">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/config.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18">
@@ -339,7 +403,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/dataset/data/venue.csv">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
+        <state relative-caret-position="1116">
           <caret line="62" column="27" selection-start-line="62" selection-start-column="3" selection-end-line="62" selection-end-column="27" />
         </state>
       </provider>
@@ -370,16 +434,6 @@
         <state relative-caret-position="-1134" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/itemKNN.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-line="5" />
-          <folding>
-            <element signature="e#0#16#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.local/lib/python2.7/site-packages/pandas/core/dtypes/common.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="209">
@@ -387,30 +441,38 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/1.py" />
+    <entry file="file:///usr/lib/python2.7/multiprocessing/process.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1980">
+          <caret line="113" selection-start-line="113" selection-end-line="113" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/process_1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="386">
-          <caret line="33" column="32" lean-forward="true" selection-start-line="33" selection-start-column="8" selection-end-line="33" selection-end-column="32" />
+        <state relative-caret-position="270">
+          <caret line="15" column="27" selection-start-line="15" selection-start-column="4" selection-end-line="15" selection-end-column="27" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/1.py">
+    <entry file="file://$PROJECT_DIR$/src/userKNN.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="558">
-          <caret line="31" column="43" lean-forward="true" selection-start-line="23" selection-end-line="31" selection-end-column="43" />
+        <state relative-caret-position="18">
+          <caret line="16" selection-start-line="16" selection-end-line="43" />
           <folding>
-            <element signature="e#0#28#0" expanded="true" />
+            <element signature="e#0#16#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/userKNN.py">
+    <entry file="file://$PROJECT_DIR$/src/itemKNN.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="99" column="6" lean-forward="true" selection-start-line="99" selection-start-column="6" selection-end-line="105" selection-end-column="55" />
+        <state relative-caret-position="-1132">
+          <caret line="93" column="31" lean-forward="true" selection-start-line="93" selection-start-column="31" selection-end-line="93" selection-end-column="31" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
           </folding>
