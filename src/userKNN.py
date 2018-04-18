@@ -8,6 +8,7 @@ from collections import OrderedDict
 import cPickle
 import os
 from joblib import Parallel, delayed
+import multiprocessing as mp
 
 # userKNN #
 # User based Neighborhood model #
@@ -64,9 +65,8 @@ class top_k:
 
         self.sim_init_val = -1000.00
         self.similarity_scores = np.full([self.num_users,self.num_users],self.sim_init_val , np.float )
-
         self.rating_matrix = None
-        self.similarity_scores = None
+
         self.setup_similarity_matrix()
         self.setup_rating_matrix()
 
@@ -80,17 +80,37 @@ class top_k:
             self.similarity_scores = cPickle.load(file)
             file.close()
             return
-
+        cur_len = 0
+        max_len = self.num_users/2 + 2
         for user in self.users:
+            # Use the fact its a symmetric matrix
+            # Truncate if cur_len > max_len
+            if cur_len > max_len :
+                break
+            cur_len +=1
+
             user_idx = user-1
             other_users = list(self.users)
             other_users.remove(user)
+            ui_matrix = np.array(self.ui_matrix)
 
-            results = Parallel(5)(delayed(aux_get_sim)(self.ui_matrix, user_idx, other_user-1) for other_user in other_users)
+            output = mp.Queue()
+            processes = [mp.Process(target=aux_get_sim, args=(ui_matrix, user_idx, other_user-1)) for other_user in other_users]
+
+            for p in processes:
+                p.start()
+
+            for p in processes:
+                p.join()
+
+            results = [output.get() for p in processes]
+
+            results = Parallel(5)(delayed(aux_get_sim)(ui_matrix, user_idx, other_user-1) for other_user in other_users)
 
             for res in results :
                 score = res[2]
                 other_user_idx = res[1]
+                print 'result ',res
                 self.similarity_scores[user_idx, other_user_idx] = score
                 self.similarity_scores[other_user_idx, user_idx] = score
 
