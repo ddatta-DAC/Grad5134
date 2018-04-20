@@ -69,9 +69,13 @@ class top_k:
         self.num_items = len(self.items)
 
         self.sim_init_val = -1000.00
-        self.similarity_scores = np.full([self.num_users, self.num_users], self.sim_init_val, np.float)
-        self.rating_matrix = None
+        self.similarity_scores = np.full(
+            [self.num_users, self.num_users],
+            self.sim_init_val,
+            np.float
+        )
 
+        self.rating_matrix = None
         self.setup_similarity_matrix()
         self.setup_rating_matrix()
 
@@ -114,25 +118,42 @@ class top_k:
         file = open(self.sim_matrix_file, 'w')
         cPickle.dump(self.similarity_scores, file)
         file.close()
+        print 'SIM MATRIX', self.similarity_scores
         return
 
+
+
     def setup_rating_matrix(self):
+
+        print ' In setup_rating_matrix . . . '
 
         if os.path.exists(self.rating_matrix_file):
             file = open(self.rating_matrix_file, 'r')
             self.rating_matrix = cPickle.load(file)
             file.close()
+            return
 
+
+        print '---'
         ui_matrix = self.ui_matrix
+        print ui_matrix
+        print '---'
+
         rating_matrix = np.zeros([self.num_users, self.num_items])
-        # set up a dictionary for each item:users who have rating for it
+
+        # Set up a dictionary for each item:users who have rating for it
         # This stores item_id : user_id
         item_user_dict = {}
+
         for item in self.items:
             item_idx = item - 1
             # set of users where j_idx is non zero
-            j_users_idx = list(np.nonzero(ui_matrix[:, item_idx]))
+            j_users_idx = list(np.nonzero(ui_matrix[:, item_idx]))[0]
             item_user_dict[item] = [y + 1 for y in j_users_idx]
+
+        print '---'
+        print item_user_dict
+        print '---'
 
         # set up the top k neighbors for each user
         for user in self.users:
@@ -148,7 +169,7 @@ class top_k:
 
                 j_idx = j - 1
                 # set of users where j_idx is non zero
-                user_id_list = item_user_dict[j]
+                user_id_list = list(item_user_dict[j])
                 j_users_idx = [y - 1 for y in user_id_list]
 
                 #  This stores user_index : score
@@ -160,13 +181,19 @@ class top_k:
                         continue
                     k_closest_dict[j_user_idx] = sim_vec[j_user_idx]
 
-                k_closest_dict = sorted(
+
+                sorted_k_closest_dict_key_val = sorted(
                     k_closest_dict.items(),
                     key=operator.itemgetter(1)
                 )
 
+                k_closest_dict = OrderedDict()
+
+                for k1_v1 in sorted_k_closest_dict_key_val:
+                    k_closest_dict[k1_v1[0]] = k1_v1[1]
+
                 k_closest_dict = itertools.islice(k_closest_dict.items(), 0, self.closest_user_k)
-                k_closest_user_idx_j = k_closest_dict.keys()
+                k_closest_dict = OrderedDict(k_closest_dict)
 
                 # Calculate the rating of item j for user u
                 num = 0.0
@@ -175,8 +202,10 @@ class top_k:
                     z = (self.ui_matrix[user_v_idx][j_idx] - np.mean(self.ui_matrix[user_v_idx]))
                     num += sim_score * z
                     den += abs(z)
-                r_uj = mean_u + (num / den)
+                if den == 0 :
+                    den += 1
 
+                r_uj = mean_u + (num / den)
                 rating_matrix[user_idx][j_idx] = r_uj
 
         self.rating_matrix = rating_matrix
@@ -202,4 +231,4 @@ class top_k:
 #     return obj
 
 
-top_k(10, 10)
+top_k(100, 100)
