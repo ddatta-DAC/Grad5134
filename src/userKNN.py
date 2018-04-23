@@ -153,7 +153,7 @@ class userKnn:
         file = open(self.sim_matrix_file, 'w')
         cPickle.dump(self.similarity_scores, file)
         file.close()
-        print 'similarity_scores', csr_matrix(self.similarity_scores)
+
         return
 
 
@@ -161,13 +161,12 @@ class userKnn:
 
         print ' In setup_rating_matrix . . . '
 
-        if os.path.exists(self.rating_matrix_file) and False:
+
+        if os.path.exists(self.rating_matrix_file):
             file = open(self.rating_matrix_file, 'r')
             self.rating_matrix = cPickle.load(file)
             file.close()
             return
-
-        ui_matrix = self.ui_matrix
 
         rating_matrix = np.zeros([self.num_users, self.num_items])
 
@@ -178,8 +177,12 @@ class userKnn:
         for item in self.items:
             item_idx = item - 1
             # set of users where j_idx is non zero
-            j_users_idx = list(np.nonzero(ui_matrix[:, item_idx]))[0]
+            j_users_idx = list(np.nonzero(self.ui_matrix[:, item_idx]))[0]
             item_user_dict[item] = [y + 1 for y in j_users_idx]
+
+        print '---'
+        print item_user_dict
+        print '---'
 
         # set up the top k neighbors for each user
         for user in self.users:
@@ -205,6 +208,7 @@ class userKnn:
                 user_id_list = list(item_user_dict[j])
                 j_users_idx = [y-1 for y in user_id_list]
 
+
                 #  This stores user_index : score
                 k_closest_dict = OrderedDict()
 
@@ -213,8 +217,6 @@ class userKnn:
                     if j_user_idx == user_idx:
                         continue
                     k_closest_dict[j_user_idx] = sim_vec[j_user_idx]
-
-
 
                 sorted_k_closest_dict_key_val = sorted(
                     k_closest_dict.items(),
@@ -228,8 +230,6 @@ class userKnn:
 
                 k_closest_dict = itertools.islice(k_closest_dict.items(), 0, self.closest_user_k)
                 k_closest_dict = OrderedDict(k_closest_dict)
-
-
 
                 # Calculate the rating of item j for user u
                 num = 0.0
@@ -274,22 +274,6 @@ class userKnn:
         # k = num_items
         ordered_items = [ x[0] for x in sorted_item_score]
         return ordered_items[0:num_items]
-
-
-    # def get_top_k_obj(self, closest_user_k , closest_items_k) :
-    #
-    #     obj_file = 'userKNN_obj_'+str(closest_user_k) + '_' + str(closest_items_k) + '.dat'
-    #
-    #     if os.path.exists(obj_file):
-    #         file = open(obj_file, 'r')
-    #         obj = cPickle.load(file)
-    #         file.close()
-    #     else:
-    #         file = open(obj_file , 'w')
-    #         obj = top_k(closest_user_k, closest_items_k)
-    #         cPickle.dump(obj,file)
-    #         file.close()
-    #     return obj
 
 
 userKnn_obj = userKnn(25)

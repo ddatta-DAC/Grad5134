@@ -20,18 +20,16 @@ def get_fake_matrix():
     return z
 
 
+
 def get_user_ids():
     user_df = pd.read_csv(config.data_dir_data + 'user.csv')
     uid_list = list(set(list(user_df['FakeID'])))
-    uid_list = uid_list[0:100]
     return uid_list
 
 
 def get_loc_ids():
     loc_df = pd.read_csv(config.data_dir_data + 'venue.csv')
     uid_list = list(set(list(loc_df['FakeID'])))
-
-    uid_list = uid_list[0:100]
     return uid_list
 
 
@@ -71,6 +69,8 @@ def create_user_item_matrix():
     file = open(ui_matrix_file, 'w')
     cPickle.dump(matrix, file)
     file.close()
+    print 'Compressed Represeentation of User-Item Matrix ', csr_matrix(matrix)
+
     return matrix
 
 
