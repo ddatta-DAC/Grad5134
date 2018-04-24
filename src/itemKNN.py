@@ -189,6 +189,10 @@ class itemKnn:
             vec_item = list(self.similarity_scores[item_idx])
 
             for user in self.users:
+                # if rating is already present skip!
+                if self.ui_matrix[user-1][item_idx] != 0.0 :
+                    continue
+
                 # find the items which are rated by user u,
                 # From them select the top k matching ones
                 user_idx = user - 1
@@ -205,8 +209,19 @@ class itemKnn:
                 # sort them and get top k!
                 k_closest_dict = self.sort_by_value_k(sim_items)
 
-                for j, score in k_closest_dict.items():
-                    rating_matrix[user_idx][j] = score
+                # Do a weighted avg over these scores
+                num = 0.0
+                den = 0.0
+                score = 0.0
+                for item_j, item_j_sim_score in k_closest_dict.items():
+                    num += item_j_sim_score * self.ui_matrix[user_idx][item_j-1]
+                    den += item_j_sim_score
+                if den == 0 :
+                    score = 0
+                else :
+                    score = num/den
+
+                rating_matrix[user_idx][item_idx] = score
 
         self.rating_matrix = rating_matrix
         # Save the rating matrix
