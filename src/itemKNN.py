@@ -5,37 +5,43 @@ import cPickle
 import os
 import multiprocessing as mp
 import math
+from sklearn.metrics.pairwise import cosine_similarity
+from multiprocessing import Queue
+import operator
+import itertools
 
 # ItemKNN #
 
-def adj_cosine_sim(vec_i, vec_j):
+# def adj_cosine_sim(vec_i, vec_j):
+#
+#     num = 0.0
+#     den_1 = 0.0
+#     den_2 = 0.0
+#     _lambda = 1
+#
+#     for r_ui, r_uj in zip(vec_i, vec_j):
+#         if r_ui == 0.0 or r_uj == 0.0:
+#             continue
+#         num += (r_ui - mean_i) * (r_uj - mean_j)
+#         den_1 = math.pow((r_ui - mean_i), 2)
+#         den_2 = math.pow((r_uj - mean_j), 2)
+#
+#     den = math.sqrt(den_1) * math.sqrt(den_2)
+#     if den == 0.0:
+#         den += _lambda
+#
+#     res = num / den
+#     return res
 
-    mean_i = np.mean(vec_i)
-    mean_j = np.mean(vec_j)
-    num = 0.0
-    den_1 = 0.0
-    den_2 = 0.0
-    _lambda = 1
-
-    for r_ui, r_uj in zip(vec_i, vec_j):
-        if r_ui == 0.0 or r_uj == 0.0:
-            continue
-        num += (r_ui - mean_i) * (r_uj - mean_j)
-        den_1 = math.pow((r_ui - mean_i), 2)
-        den_2 = math.pow((r_uj - mean_j), 2)
-
-    den = math.sqrt(den_1) * math.sqrt(den_2)
-    if den == 0.0:
-        den += _lambda
-
-    res = num / den
+def cosine_sim(vec_u, vec_v):
+    res = cosine_similarity([vec_u], [vec_v])[0][0]
     return res
 
 
 # Input 2 vectors
 # Return : similarity score
 def similarity(vec_a, vec_b):
-    res = adj_cosine_sim(vec_a, vec_b)
+    res = cosine_sim(vec_a, vec_b)
     return res
 
 
@@ -48,15 +54,14 @@ def aux_get_sim(ui_matrix, similarity_scores, idx1, idx2, lock):
     return
 
 
-class top_k:
+class itemKnn:
 
-    def __init__(self, closest_items_k, closest_users_k):
+    def __init__(self, closest_items_k):
+        print ' Constructing userKNN class with Number of neighborhood users considered ', closest_items_k
 
         self.sim_matrix_file = 'item_sim_matrix.dat'
-        self.rating_matrix_file = 'rating_2_matrix.dat'
-
-        # self.closest_user_k = closest_users_k
-        # self.closest_items_k = closest_items_k
+        self.rating_matrix_file = 'rating_itemKNN_' + str(closest_items_k) + '.dat'
+        self.closest_items_k = closest_items_k
 
         self.ui_matrix = process_1.create_user_item_matrix()
         self.users = process_1.get_user_ids()
@@ -64,12 +69,18 @@ class top_k:
         self.num_users = len(self.users)
         self.num_items = len(self.items)
 
-        self.sim_init_val = -1000.00
+        self.sim_init_val = 0.0
         self.similarity_scores = np.full([self.num_items, self.num_items], self.sim_init_val, np.float)
         self.rating_matrix = None
-
+        print self.num_items ,  self.num_users
         self.setup_similarity_matrix()
-        # self.setup_rating_matrix()
+        self.setup_rating_matrix()
+        return
+
+    def aux_get_sim(self, q, idx1, idx2):
+        score = similarity(self.ui_matrix[:, idx1], self.ui_matrix[:, idx2])
+        print 'Score ', idx1, idx2, score
+        q.put([idx1, idx2, score])
         return
 
     # set up the similarity score matrix
@@ -82,7 +93,7 @@ class top_k:
             return
 
         cur_len = 0
-        max_len = self.num_items / 2 + 2
+        max_len = (self.num_items / 2) + 2
 
         for item in self.items:
             # Use the fact its a symmetric matrix
@@ -91,16 +102,23 @@ class top_k:
                 break
             cur_len += 1
 
+
             item_idx = item - 1
             other_items = list(self.items)
             other_items.remove(item)
 
-            ui_matrix = np.array(self.ui_matrix)
-            lock = mp.Lock()
-
+            q = Queue()
             processes = [
-                mp.Process(target=aux_get_sim, args=(ui_matrix, self.similarity_scores, item_idx, other_item - 1, lock))
-                for other_item in other_items]
+                mp.Process(
+                    target=self.aux_get_sim,
+                    args=(
+                        q,
+                        item_idx,
+                        other_item - 1
+                    )
+                )
+                for other_item in other_items
+            ]
 
             for p in processes:
                 p.start()
@@ -108,11 +126,108 @@ class top_k:
             for p in processes:
                 p.join()
 
+            while q.empty() == False:
+                res = q.get()
+                idx_1 = res[0]
+                idx_2 = res[1]
+                score = res[2]
+                self.similarity_scores[idx_1][idx_2] = score
+                self.similarity_scores[idx_2][idx_1] = score
+
         # Write the similarity matrix to file
+
         file = open(self.sim_matrix_file, 'w')
         cPickle.dump(self.similarity_scores, file)
         file.close()
+
         return
+
+    def sort_by_value_k(self,ordDict):
+
+        # sort
+        sorted_k_closest_dict_key_val = sorted(
+            ordDict.items(),
+            key=operator.itemgetter(1),
+            reverse=True
+        )
+
+        k_closest_dict = OrderedDict()
+
+        for k1_v1 in sorted_k_closest_dict_key_val:
+            k_closest_dict[k1_v1[0]] = k1_v1[1]
+
+        # pick top k
+        k_closest_dict = itertools.islice(k_closest_dict.items(), 0, self.closest_items_k)
+        k_closest_dict = OrderedDict(k_closest_dict)
+
+        return k_closest_dict
+
+    def setup_rating_matrix(self):
+
+        print ' In setup_rating_matrix . . . '
+
+        if os.path.exists(self.rating_matrix_file):
+            file = open(self.rating_matrix_file, 'r')
+            self.rating_matrix = cPickle.load(file)
+            file.close()
+            return
+
+        rating_matrix = np.zeros([self.num_items, self.num_items])
+
+
+        for item in self.items:
+            print 'item ', item
+            item_idx = item - 1
+            col_vec = self.ui_matrix[item_idx]
+
+            if len(np.nonzero(col_vec)[0]) > 0:
+                mean_i = float(np.sum(col_vec)) / len(np.nonzero(col_vec)[0])
+            else:
+                mean_i = 0
+
+            sim_vec = self.similarity_scores[:,item_idx]
+
+
+            other_items = list(self.items)
+            other_items.remove(item)
+
+            vec_j = self.similarity_scores[item_idx,:]
+            k_closest_dict = OrderedDict()
+            # Select top k items which are most similar to this item
+
+            for j in other_items:
+                j_idx = j - 1
+                k_closest_dict[j_idx] = vec_j[j_idx]
+
+            k_closest_dict = self.sort_by_value_k(k_closest_dict)
+
+            print k_closest_dict
+            exit(1)
+
+            # # Calculate the rating of item j for user u
+            # num = 0.0
+            # den = 0.0
+            #
+            # for user_v_idx, sim_score in k_closest_dict.iteritems():
+            #     k1 = self.ui_matrix[user_v_idx][j_idx]
+            #     k2 = np.mean(self.ui_matrix[user_v_idx])
+            #     z = (k1)  # tried k1-k2
+            #     num += sim_score * z
+            #     den += abs(z)
+            # if den == 0:
+            #     den += 1
+            #
+            # r_uj = (num / den)
+            # rating_matrix[user_idx][j_idx] = r_uj
+
+        self.rating_matrix = rating_matrix
+        # Save the rating matrix
+        file = open(self.rating_matrix_file, 'w')
+        cPickle.dump(self.rating_matrix, file)
+        # print 'Rating matrix', csr_matrix(rating_matrix)
+        file.close()
+        return
+
 
     # def setup_rating_matrix(self):
     #
@@ -185,6 +300,7 @@ class top_k:
     #     return
 
 
+
 # def get_top_k_obj(closest_user_k , closest_items_k) :
 #     obj_file = 'userKNN_obj_'+str(closest_user_k) + '_' + str(closest_items_k) + '.dat'
 #
@@ -200,6 +316,4 @@ class top_k:
 #     return obj
 
 
-
-
-obj = top_k(25, 25)
+obj = itemKnn(25)

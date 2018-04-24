@@ -12,6 +12,7 @@ import pprint
 from multiprocessing import Queue
 from scipy.sparse import csr_matrix
 from sklearn.metrics.pairwise import cosine_similarity
+
 # userKNN #
 # User based Neighborhood model #
 # Refer : Charu Aggarwal's Recommender system book #
@@ -94,10 +95,12 @@ class userKnn:
 
         return
 
+
     def aux_get_sim(self,q, idx1, idx2):
         score = similarity(self.ui_matrix[idx1, :], self.ui_matrix[idx2, :])
         q.put([idx1,idx2,score])
         return
+
 
     # set up the similarity score matrix
     def setup_similarity_matrix(self):
@@ -161,7 +164,6 @@ class userKnn:
 
         print ' In setup_rating_matrix . . . '
 
-
         if os.path.exists(self.rating_matrix_file):
             file = open(self.rating_matrix_file, 'r')
             self.rating_matrix = cPickle.load(file)
@@ -220,7 +222,8 @@ class userKnn:
 
                 sorted_k_closest_dict_key_val = sorted(
                     k_closest_dict.items(),
-                    key=operator.itemgetter(1)
+                    key=operator.itemgetter(1),
+                    reverse=True
                 )
 
                 k_closest_dict = OrderedDict()
@@ -256,15 +259,14 @@ class userKnn:
         file.close()
         return
 
-    def recommend_items(self, user_id , num_items):
-        rec_vec = self.rating_matrix[user_id-1]
+    def recommend_items(self, user_id, num_items):
+        rec_vec = self.rating_matrix[user_id - 1]
         # sort the items by recommendation
         # this dictionary will have  item : score
         rec_dict = {}
         for item_idx in range(len(rec_vec)):
-            if rec_vec[item_idx] > 0.0 :
-                rec_dict[item_idx+1] = rec_vec[item_idx]
-
+            if rec_vec[item_idx] > 0.0:
+                rec_dict[item_idx + 1] = rec_vec[item_idx]
 
         sorted_item_score = sorted(
             rec_dict.items(),
@@ -272,7 +274,7 @@ class userKnn:
         )
         # Return the top k
         # k = num_items
-        ordered_items = [ x[0] for x in sorted_item_score]
+        ordered_items = [x[0] for x in sorted_item_score]
         return ordered_items[0:num_items]
 
 
