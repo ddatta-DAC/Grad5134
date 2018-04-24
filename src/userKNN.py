@@ -270,7 +270,8 @@ class userKnn:
 
         sorted_item_score = sorted(
             rec_dict.items(),
-            key=operator.itemgetter(1)
+            key=operator.itemgetter(1),
+            reverse=True
         )
         # Return the top k
         # k = num_items

@@ -6,7 +6,7 @@ import cPickle
 import os
 ui_matrix_file = 'ui_matrix.dat'
 
-TEST_FLAG = True
+TEST_FLAG = False
 
 
 #TEST
@@ -24,14 +24,12 @@ def get_fake_matrix():
 def get_user_ids():
     user_df = pd.read_csv(config.data_dir_data + 'user.csv')
     uid_list = list(set(list(user_df['FakeID'])))
-    uid_list = uid_list[0:25]
     return uid_list
 
 
 def get_loc_ids():
     loc_df = pd.read_csv(config.data_dir_data + 'venue.csv')
     uid_list = list(set(list(loc_df['FakeID'])))
-    uid_list = uid_list[0:20]
     return uid_list
 
 
@@ -41,7 +39,6 @@ def create_user_item_matrix():
 
     if TEST_FLAG :
         return get_fake_matrix()
-
 
     if os.path.exists(ui_matrix_file):
         file = open(ui_matrix_file, 'r')
