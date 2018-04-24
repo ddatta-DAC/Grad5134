@@ -156,6 +156,7 @@ class userKnn:
                 idx_1 = res[0]
                 idx_2 = res[1]
                 score = res[2]
+                print ' Fetched from queue > ', idx_1, idx_2, score
                 self.similarity_scores[idx_1][idx_2] = score
                 self.similarity_scores[idx_2][idx_1] = score
 
