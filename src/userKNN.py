@@ -72,6 +72,11 @@ def aux_get_sim(q, lock, ui_matrix, idx1, idx2):
     lock.release()
     return
 
+def chunk(arr, size):
+    """Yield successive n-sized chunks from l."""
+    for i in xrange(0, len(arr), size):
+        yield arr[i:i + size]
+
 
 class userKnn:
 
@@ -123,42 +128,48 @@ class userKnn:
             if cur_len > max_len:
                 break
             cur_len += 1
+            # Limit to 20 Processes
+            max_proc = 20
 
-            lock = mp.Lock()
-            q = Queue()
             ui_matrix = np.asarray(self.ui_matrix)
             user_idx = user - 1
             other_users = list(self.users)
             other_users.remove(user)
 
-            processes = [
-                mp.Process(
-                    target=self.aux_get_sim,
-                    args=(
-                        q,
-                        lock,
-                        ui_matrix,
-                        user_idx,
-                        other_user - 1
+            for _other_users in chunk(other_users,max_proc):
+
+                print'Segment ', _other_users
+                lock = mp.Lock()
+                q = Queue()
+
+                processes = [
+                    mp.Process(
+                        target=aux_get_sim,
+                        args=(
+                            q,
+                            lock,
+                            ui_matrix,
+                            user_idx,
+                            other_user - 1
+                        )
                     )
-                )
-                for other_user in other_users
-            ]
+                    for other_user in _other_users
+                ]
 
-            for p in processes:
-                p.start()
+                for p in processes:
+                    p.start()
 
-            for p in processes:
-                p.join()
+                for p in processes:
+                    p.join()
 
-            while q.empty() == False:
-                res = q.get()
-                idx_1 = res[0]
-                idx_2 = res[1]
-                score = res[2]
-                print ' Fetched from queue > ', idx_1, idx_2, score
-                self.similarity_scores[idx_1][idx_2] = score
-                self.similarity_scores[idx_2][idx_1] = score
+                while q.empty() == False:
+                    res = q.get()
+                    idx_1 = res[0]
+                    idx_2 = res[1]
+                    score = res[2]
+                    print ' Fetched from queue > ', idx_1, idx_2, score
+                    self.similarity_scores[idx_1][idx_2] = score
+                    self.similarity_scores[idx_2][idx_1] = score
 
         # Write the similarity matrix to file
         file = open(self.sim_matrix_file, 'w')
