@@ -65,6 +65,13 @@ def similarity(vec_a, vec_b):
     return res
 
 
+def aux_get_sim(q, lock, ui_matrix, idx1, idx2):
+    score = similarity(ui_matrix[idx1, :], ui_matrix[idx2, :])
+    lock.acquire()
+    q.put([idx1, idx2, score])
+    lock.release()
+    return
+
 
 class userKnn:
 
@@ -96,11 +103,6 @@ class userKnn:
         return
 
 
-    def aux_get_sim(self,q, idx1, idx2):
-        score = similarity(self.ui_matrix[idx1, :], self.ui_matrix[idx2, :])
-        q.put([idx1,idx2,score])
-        return
-
 
     # set up the similarity score matrix
     def setup_similarity_matrix(self):
@@ -121,7 +123,10 @@ class userKnn:
             if cur_len > max_len:
                 break
             cur_len += 1
+
+            lock = mp.Lock()
             q = Queue()
+            ui_matrix = np.asarray(self.ui_matrix)
             user_idx = user - 1
             other_users = list(self.users)
             other_users.remove(user)
@@ -131,6 +136,8 @@ class userKnn:
                     target=self.aux_get_sim,
                     args=(
                         q,
+                        lock,
+                        ui_matrix,
                         user_idx,
                         other_user - 1
                     )
