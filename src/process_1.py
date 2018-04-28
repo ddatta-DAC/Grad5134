@@ -5,15 +5,12 @@ from scipy.sparse import csr_matrix
 import cPickle
 import os
 import pprint
+
 ui_matrix_file = 'ui_matrix.dat'
 
-<<<<<<< HEAD
 TEST_FLAG = False
 item_comm_area_map = {}
 comm_area_item_map = {}
-=======
-TEST_FLAG = True
->>>>>>> 8b20c579c88406e48392ef30ce8933516e0fcce6
 
 
 # TEST
@@ -29,25 +26,19 @@ def get_fake_matrix():
 def get_user_ids():
     user_df = pd.read_csv(config.data_dir_data + 'user.csv')
     uid_list = list(set(list(user_df['FakeID'])))
-<<<<<<< HEAD
-
     return uid_list
-=======
-    return uid_list[0:25]
-	return uid_list
->>>>>>> 8b20c579c88406e48392ef30ce8933516e0fcce6
+
+
+# return uid_list
 
 
 def get_loc_ids():
     loc_df = pd.read_csv(config.data_dir_data + 'venue.csv')
     uid_list = list(set(list(loc_df['FakeID'])))
-<<<<<<< HEAD
-
     return uid_list
-=======
-    return uid_list[0:20]
-	return uid_list
->>>>>>> 8b20c579c88406e48392ef30ce8933516e0fcce6
+
+
+# return uid_list
 
 
 def create_user_item_matrix():
@@ -139,7 +130,6 @@ def setup_commu_area_lid():
     if count == 2:
         return
 
-
     f_name = config.data_dir_data + 'venue_comm.csv'
     df_venue = pd.read_csv(f_name)
 
@@ -154,8 +144,8 @@ def setup_commu_area_lid():
         else:
             comm_area_item_map[ca] = [item]
 
-    file = open(comm_area_item_map_file,'w')
-    cPickle.dump(comm_area_item_map,file)
+    file = open(comm_area_item_map_file, 'w')
+    cPickle.dump(comm_area_item_map, file)
     file.close()
 
     file = open(item_comm_area_map_file, 'w')

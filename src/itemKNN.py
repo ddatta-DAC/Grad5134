@@ -55,10 +55,11 @@ def aux_get_sim(ui_matrix, similarity_scores, idx1, idx2, lock):
     lock.release()
     return
 
+
 def chunk(arr, size):
-	"""Yield successive n-sized chunks from l."""
-	for i in xrange(0, len(arr), size):
-		yield arr[i:i + size]
+    """Yield successive n-sized chunks from l."""
+    for i in xrange(0, len(arr), size):
+        yield arr[i:i + size]
 
 
 class itemKnn:
@@ -107,42 +108,42 @@ class itemKnn:
             if cur_len > max_len:
                 break
             cur_len += 1
-			max_proc = 50
-            
-			item_idx = item - 1
+            max_proc = 50
+
+            item_idx = item - 1
             other_items = list(self.items)
             other_items.remove(item)
-			
-			for _other_users in chunk(other_users,max_proc):
 
-                print'Segment ', _other_users
+            for _other_items in chunk(other_items, max_proc):
+
+                print'Segment ', _other_items
                 lock = mp.Lock()
                 q = Queue()
-            
-            	processes = [
-                	mp.Process(
-                    	target=self.aux_get_sim,
-                    	args=(
-                        	q,
-                        	item_idx,
-                        	other_item - 1
-                    	)
-                	)	for other_item in other_items
-            		]
 
-            	for p in processes:
-                	p.start()
+                processes = [
+                    mp.Process(
+                        target=self.aux_get_sim,
+                        args=(
+                            q,
+                            item_idx,
+                            other_item - 1
+                        )
+                    ) for other_item in _other_items
+                ]
 
-            	for p in processes:
-                	p.join()
+                for p in processes:
+                    p.start()
 
-            	while q.empty() == False:
-                	res = q.get()
-                	idx_1 = res[0]
-                	idx_2 = res[1]
-                	score = res[2]
-                	self.similarity_scores[idx_1][idx_2] = score
-                	self.similarity_scores[idx_2][idx_1] = score
+                for p in processes:
+                    p.join()
+
+                while q.empty() == False:
+                    res = q.get()
+                    idx_1 = res[0]
+                    idx_2 = res[1]
+                    score = res[2]
+                    self.similarity_scores[idx_1][idx_2] = score
+                    self.similarity_scores[idx_2][idx_1] = score
 
         # Write the similarity matrix to file
 
@@ -153,7 +154,6 @@ class itemKnn:
         return
 
     def sort_by_value_k(self, ordDict):
-
         # sort
         sorted_k_closest_dict_key_val = sorted(
             ordDict.items(),
@@ -173,7 +173,6 @@ class itemKnn:
         return k_closest_dict
 
     def setup_rating_matrix(self):
-
         print ' In setup_rating_matrix . . . '
 
         if os.path.exists(self.rating_matrix_file):
@@ -200,7 +199,7 @@ class itemKnn:
 
             for user in self.users:
                 # if rating is already present skip!
-                if self.ui_matrix[user-1][item_idx] != 0.0 :
+                if self.ui_matrix[user - 1][item_idx] != 0.0:
                     continue
 
                 # find the items which are rated by user u,
@@ -224,12 +223,12 @@ class itemKnn:
                 den = 0.0
                 score = 0.0
                 for item_j, item_j_sim_score in k_closest_dict.items():
-                    num += item_j_sim_score * self.ui_matrix[user_idx][item_j-1]
+                    num += item_j_sim_score * self.ui_matrix[user_idx][item_j - 1]
                     den += item_j_sim_score
-                if den == 0 :
+                if den == 0:
                     score = 0
-                else :
-                    score = num/den
+                else:
+                    score = num / den
 
                 rating_matrix[user_idx][item_idx] = score
 
@@ -263,5 +262,4 @@ class itemKnn:
 
 
 itemKnn_obj = itemKnn(25)
-
-
+print itemKnn_obj.recommend_items(user_id=75, num_items=10)

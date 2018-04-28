@@ -299,4 +299,4 @@ class userKnn:
 
 
 userKnn_obj = userKnn(25)
-print userKnn_obj.recommend_items(user_id=75,num_items=2)
+print userKnn_obj.recommend_items(user_id=75,num_items=10)
