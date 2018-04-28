@@ -25,9 +25,10 @@ def process_crime_data():
         cols.remove(x)
 
     pprint.pprint(cols)
-    violent_crimes = ['PUBLIC PEACE VIOLATION', 'KIDNAPPING', 'BURGLARY', 'CRIMINAL DAMAGE', 'WEAPONS VIOLATION',
-                      'OBSCENITY', 'ARSON', 'NARCOTICS', 'SEX OFFENSE', 'INTIMIDATION', 'BATTERY',
-                      'NON - CRIMINAL', 'STALKING', 'ASSAULT', 'CRIM SEXUAL ASSAULT']
+    violent_crimes = ['PUBLIC PEACE VIOLATION', 'KIDNAPPING',
+                      'BURGLARY', 'CRIMINAL DAMAGE', 'WEAPONS VIOLATION',
+                      'OBSCENITY', 'ARSON', 'NARCOTICS',
+                      'SEX OFFENSE', 'INTIMIDATION', 'BATTERY', 'STALKING', 'ASSAULT', 'CRIM SEXUAL ASSAULT']
 
     cols_1 = list(violent_crimes)
     cols_1.append('commu_area')
@@ -52,7 +53,13 @@ def process_crime_data():
     plt.figure()
     plt.tight_layout()
     plt.title(' Community Area vs Violent Crimes ', fontsize=28)
-    seaborn.barplot(x="commu_area", y="violent_crime", data=vc_df, palette="Greens_d");
+    seaborn.barplot(
+        x="commu_area",
+        y="violent_crime",
+        data=vc_df,
+        palette="Greens_d"
+    )
+
     plt.xlabel('Community Area', fontsize=24)
     plt.ylabel('Count of Violent Crimes', fontsize=24)
     plt.xticks(fontsize=12, rotation=90)
@@ -60,7 +67,7 @@ def process_crime_data():
     plt.close()
 
     # Top 15 most crime prone areas heatmap
-    plt.figure(figsize=[16,7])
+    plt.figure(figsize=[18,7])
     plt.tight_layout()
     top15_vc = vc_df.sort_values(by='violent_crime')
     top15_vc = top15_vc.rename({'violent_crime': 'Total Violent Crimes'},axis=1)
@@ -79,7 +86,10 @@ def process_crime_data():
     plt.xlabel('Crime Type', fontsize=24)
     plt.xticks(fontsize=10, rotation=40)
     plt.yticks(fontsize=14, rotation=45)
-    # plt.show()
+    plt.show()
+    return
+
+
 
 
 process_crime_data()
