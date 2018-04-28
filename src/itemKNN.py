@@ -55,6 +55,11 @@ def aux_get_sim(ui_matrix, similarity_scores, idx1, idx2, lock):
     lock.release()
     return
 
+def chunk(arr, size):
+	"""Yield successive n-sized chunks from l."""
+	for i in xrange(0, len(arr), size):
+		yield arr[i:i + size]
+
 
 class itemKnn:
 
@@ -102,37 +107,42 @@ class itemKnn:
             if cur_len > max_len:
                 break
             cur_len += 1
-
-            item_idx = item - 1
+			max_proc = 50
+            
+			item_idx = item - 1
             other_items = list(self.items)
             other_items.remove(item)
+			
+			for _other_users in chunk(other_users,max_proc):
 
-            q = Queue()
-            processes = [
-                mp.Process(
-                    target=self.aux_get_sim,
-                    args=(
-                        q,
-                        item_idx,
-                        other_item - 1
-                    )
-                )
-                for other_item in other_items
-            ]
+                print'Segment ', _other_users
+                lock = mp.Lock()
+                q = Queue()
+            
+            	processes = [
+                	mp.Process(
+                    	target=self.aux_get_sim,
+                    	args=(
+                        	q,
+                        	item_idx,
+                        	other_item - 1
+                    	)
+                	)	for other_item in other_items
+            		]
 
-            for p in processes:
-                p.start()
+            	for p in processes:
+                	p.start()
 
-            for p in processes:
-                p.join()
+            	for p in processes:
+                	p.join()
 
-            while q.empty() == False:
-                res = q.get()
-                idx_1 = res[0]
-                idx_2 = res[1]
-                score = res[2]
-                self.similarity_scores[idx_1][idx_2] = score
-                self.similarity_scores[idx_2][idx_1] = score
+            	while q.empty() == False:
+                	res = q.get()
+                	idx_1 = res[0]
+                	idx_2 = res[1]
+                	score = res[2]
+                	self.similarity_scores[idx_1][idx_2] = score
+                	self.similarity_scores[idx_2][idx_1] = score
 
         # Write the similarity matrix to file
 
